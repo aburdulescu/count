@@ -18,7 +18,7 @@ func main() {
 
 func mainErr() error {
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, `Usage:
+		fmt.Fprint(os.Stderr, `Usage:
 
   count up DURATION
 
