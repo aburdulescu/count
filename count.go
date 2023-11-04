@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
+	"runtime/debug"
 	"strings"
 	"time"
 )
@@ -15,7 +17,37 @@ func main() {
 }
 
 func mainErr() error {
-	args := os.Args[1:]
+	flag.Usage = func() {
+		fmt.Fprintln(os.Stderr, `Usage:
+
+  count up DURATION
+
+    Count one second at a time up to the given DURATION.
+
+  count down DURATION
+
+    Count one second at a time down from the given DURATION.
+
+DURATION format:
+  A duration is a sequence of decimal numbers,
+  each with optional fraction and a unit
+  suffix, such as "300ms", "1.5h" or "2h45m".
+  Valid time units are "ns", "us", "ms", "s", "m", "h".
+
+Flags:
+`)
+		flag.PrintDefaults()
+	}
+	printVersion := flag.Bool("version", false, "Print version")
+	flag.Parse()
+
+	if *printVersion {
+		bi, _ := debug.ReadBuildInfo()
+		fmt.Print(bi)
+		return nil
+	}
+
+	args := flag.Args()
 
 	if len(args) < 1 {
 		return fmt.Errorf("need direction: up or down")
