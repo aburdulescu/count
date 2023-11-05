@@ -20,11 +20,11 @@ func mainErr() error {
 	flag.Usage = func() {
 		fmt.Fprint(os.Stderr, `Usage:
 
-  count up DURATION
+  count up DURATION [MESSAGE]
 
     Count one second at a time up to the given DURATION.
 
-  count down DURATION
+  count down DURATION [MESSAGE]
 
     Count one second at a time down from the given DURATION.
 
@@ -52,23 +52,26 @@ Flags:
 	if len(args) < 1 {
 		return fmt.Errorf("need direction: up or down")
 	}
-
 	direction := args[0]
 
 	if len(args) < 2 {
 		return fmt.Errorf("need duration")
 	}
-
 	duration, err := time.ParseDuration(args[1])
 	if err != nil {
 		return err
 	}
 
+	msg := ""
+	if len(args) > 2 {
+		msg = flag.Arg(2)
+	}
+
 	switch direction {
 	case "down":
-		down(duration)
+		down(duration, msg)
 	case "up":
-		up(duration)
+		up(duration, msg)
 	default:
 		return fmt.Errorf("invalid direction: %s", direction)
 	}
@@ -78,11 +81,15 @@ Flags:
 
 const step = 1 * time.Second
 
-func down(duration time.Duration) {
+func down(duration time.Duration, msg string) {
 	c := time.Tick(step)
 
 	s := duration.String()
 	prevLen := len(s)
+
+	if msg != "" {
+		fmt.Printf("\t%s\n", msg)
+	}
 
 	fmt.Printf("\t%s\r", s)
 
@@ -108,10 +115,14 @@ func down(duration time.Duration) {
 	}
 }
 
-func up(duration time.Duration) {
+func up(duration time.Duration, msg string) {
 	c := time.Tick(step)
 
 	count := 1 * time.Second
+
+	if msg != "" {
+		fmt.Printf("\t%s\n", msg)
+	}
 
 	for range c {
 		fmt.Printf("\t%s\r", count)
